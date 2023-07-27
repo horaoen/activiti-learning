@@ -4,7 +4,6 @@ import com.horaoen.activitilearning.util.ProcessUtil;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngines;
 import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
 import org.activiti.engine.repository.Deployment;
 import org.junit.jupiter.api.Test;
 
