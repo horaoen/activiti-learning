@@ -1,9 +1,10 @@
 package com.horaoen.activitilearning.service;
 
 
-public class TaskService {
+import java.io.Serializable;
+
+public class TaskService implements Serializable {
     private final static String USER_CODE = "wangwu";
-    @SuppressWarnings("unused")
     public String getAssignee() {
         return USER_CODE;
     }

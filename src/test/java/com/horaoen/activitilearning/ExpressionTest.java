@@ -3,7 +3,6 @@ package com.horaoen.activitilearning;
 import com.horaoen.activitilearning.util.ProcessUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.*;
-import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.junit.jupiter.api.Test;
@@ -60,10 +59,13 @@ public class ExpressionTest {
         final String path = "flow/simple-leave03.bpmn20.xml";
         final String deployName = "simple leave with method expression";
         ProcessEngine defaultProcessEngine = ProcessEngines.getDefaultProcessEngine();
+        
         ProcessUtil.deployByResourcePath(defaultProcessEngine, path, deployName);
 
         RuntimeService runtimeService = defaultProcessEngine.getRuntimeService();
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simple-leave03");
+        HashMap<String, Object> variables = new HashMap<>();
+        variables.put("taskService", new com.horaoen.activitilearning.service.TaskService());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simple-leave03", variables);
 
         TaskService taskService = defaultProcessEngine.getTaskService();
         // 人事审批

@@ -16,8 +16,5 @@
         <!-- mail server configurations -->
         <property name="mailServerPort" value="5025"/>
     </bean>
-    
-    <bean id="taskService"
-        class="com.horaoen.activitilearning.service.TaskService">
-    </bean>
+
 </beans>
