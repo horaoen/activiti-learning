@@ -1,5 +1,7 @@
 package com.horaoen.activitilearning;
 
+import com.horaoen.activitilearning.util.ProcessUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.*;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -12,20 +14,14 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@Slf4j
 public class ExpressionTest {
     @Test
-    public void simpleLeave02ValueExpression() {
+    public void simpleLeave02ValueExpressionTest() {
         final String deployName = "simple-leave with expression";
+        final String path = "flow/simple-leave02.bpmn20.xml";
         ProcessEngine defaultProcessEngine = ProcessEngines.getDefaultProcessEngine();
-        RepositoryService repositoryService = defaultProcessEngine.getRepositoryService();
-        Deployment deploy = repositoryService.createDeployment()
-                .addClasspathResource("flow/simple-leave02.bpmn20.xml")
-                .enableDuplicateFiltering()
-                .name(deployName)
-                .deploy();
-        
-        assertNotNull(deploy.getId());
-        assertEquals(deployName, deploy.getName());
+        ProcessUtil.deployByResourcePath(defaultProcessEngine, path, deployName);
 
         RuntimeService runtimeService = defaultProcessEngine.getRuntimeService();
 
@@ -57,5 +53,36 @@ public class ExpressionTest {
         
         assertEquals(1, lisiTasks.size());
         taskService.complete(lisiTasks.get(0).getId());
+    }
+    
+    @Test
+    public void simpleLeave03MethodExpressionTest() {
+        final String path = "flow/simple-leave03.bpmn20.xml";
+        final String deployName = "simple leave with method expression";
+        ProcessEngine defaultProcessEngine = ProcessEngines.getDefaultProcessEngine();
+        ProcessUtil.deployByResourcePath(defaultProcessEngine, path, deployName);
+
+        RuntimeService runtimeService = defaultProcessEngine.getRuntimeService();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simple-leave03");
+
+        TaskService taskService = defaultProcessEngine.getTaskService();
+        // 人事审批
+        Task task = taskService.createTaskQuery()
+                .taskAssignee(new com.horaoen.activitilearning.service.TaskService().getAssignee()).singleResult();
+        
+        assertNotNull(task);
+        assertEquals(processInstance.getId(), task.getProcessInstanceId());
+        
+        // complete
+        taskService.complete(task.getId());
+        
+        // 经理审批
+        task = taskService.createTaskQuery()
+                .taskAssignee(new com.horaoen.activitilearning.service.TaskService().getAssignee()).singleResult();
+        assertNotNull(task);
+        assertEquals(processInstance.getId(), task.getProcessInstanceId());
+
+        // complete
+        taskService.complete(task.getId());
     }
 }
